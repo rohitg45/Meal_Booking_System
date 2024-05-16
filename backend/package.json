@@ -1,0 +1,19 @@
+{
+  "name": "backend",
+  "version": "1.0.0",
+  "description": "",
+  "main": "server.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node server.js nodemon"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "express": "^4.19.2",
+    "mailgen": "^2.0.28",
+    "mongoose": "^8.3.5",
+    "nodemailer": "^6.9.13",
+    "nodemon": "^3.1.0"
+  }
+}

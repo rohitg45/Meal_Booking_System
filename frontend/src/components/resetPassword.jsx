@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
 import { useNavigate } from "react-router-dom";
-import '../App.css';
 
 const ResetPassword = () => {
   const navigate = useNavigate();
@@ -21,7 +20,7 @@ const ResetPassword = () => {
     if (newPassword === confirmPassword) {
       alert("Password reset successfully");
       // Add logic to reset password in backend and navigate to login page
-      navigate("/login");
+      navigate("/");
     } else {
       alert("Passwords do not match");
     }

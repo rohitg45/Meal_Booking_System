@@ -1,11 +1,37 @@
-import React from 'react';
-import '../App.css'; // Import your main CSS file here
-// import logo from './../images/logo.svg';
+import React, { useState } from 'react';
+import { useNavigate } from "react-router-dom";
 
 const ForgotPassword = () => {
-  const handleSubmit = (e) => {
+  const navigate = useNavigate();
+  const [email, setEmail] = useState('');
+
+  const handleemailChange = (e) => {
+    setEmail(e.target.value);
+  };
+
+  const handleSubmit = async(e) => {
     e.preventDefault();
     // Add your form submission logic here
+    const res = await fetch('http://localhost:8000/api/user/forgotpassword', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      withCredentials: true,
+      credentials:'include',
+      body: JSON.stringify({ email })
+    });
+
+    const data = await res.json();
+
+    if(!data.success){
+      alert(data.message);
+      return;
+    }
+    
+    alert("Email send successfully");
+    navigate("/");
+    
   };
 
   return (
@@ -23,7 +49,14 @@ const ForgotPassword = () => {
             <div className="form-group">
               <label className="control-label">Email</label>
               <div className="input-addon">
-                <input className="form-control" type="text" placeholder="Robert@rishabhsoft.com" autoFocus />
+                <input
+                    className="form-control"
+                    type="text"
+                    placeholder="Robert Smith"
+                    autoFocus
+                    value={email}
+                    onChange={handleemailChange}
+                  />
                 <div className="icon-after icon-green"><i className="las la-check"></i></div>
               </div>
               {/* <div className="error-block">Error display here</div> */}

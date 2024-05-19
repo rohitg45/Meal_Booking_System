@@ -1,12 +1,15 @@
-const nodemailer = require('nodemailer');
-const Mailgen = require('mailgen');
+import nodemailer from "nodemailer";
+import Mailgen from 'mailgen';
 
-const { EMAIL, PASSWORD } = require('../env.js')
+import {configDotenv} from "dotenv";
+configDotenv();
+
+const { EMAIL, PASSWORD } = process.env;
 
 /** send mail from gmail account */
-const getmail = (req, res) => {
+const sendMail = (userEmail, subject,body) => {
 
-    const { userEmail } = req.body;
+    // const { userEmail } = req.body;
 
     let config = {
         service : 'gmail',
@@ -28,8 +31,8 @@ const getmail = (req, res) => {
 
     let response = {
         body: {
-            name : "User",
-            intro: "To set your new password click on below link",
+            // name : "User",
+            // intro: "To set your new password click on below link",
             // link: "https://www.w3schools.com/",
             // table : {
             //     data : [
@@ -40,7 +43,7 @@ const getmail = (req, res) => {
             //         }
             //     ]
             // },
-            outro: `https://www.w3schools.com/`
+            outro: body
         }
     }
 
@@ -49,20 +52,19 @@ const getmail = (req, res) => {
     let message = {
         from : EMAIL,
         to : userEmail,
-        subject: "Forgot Password",
+        subject: subject,
         html: mail
     }
 
-    transporter.sendMail(message).then(() => {
-        return res.status(201).json({
-            msg: "you should receive an email"
-        })
+    transporter.sendMail(message)
+    .then(() => {
+       console.log("You should receive an email");
     }).catch(error => {
-        return res.status(500).json({ error })
+        console.log("Error: ", error);
     })
 }
 
 
-module.exports = {
-    getmail
+export {
+    sendMail
 }

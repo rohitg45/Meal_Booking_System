@@ -1,12 +1,10 @@
 import React, { useState } from 'react';
 import { useNavigate } from "react-router-dom";
-import '../App.css';
-// import logo from './../images/logo.svg';
 
-const Login=()=> {
+const Login = () => {
   const navigate = useNavigate();
   const [showPassword, setShowPassword] = useState(false);
-  const [username, setUsername] = useState('');
+  const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [rememberMe, setRememberMe] = useState(false);
 
@@ -14,8 +12,8 @@ const Login=()=> {
     setShowPassword(!showPassword);
   };
 
-  const handleUsernameChange = (e) => {
-    setUsername(e.target.value);
+  const handleemailChange = (e) => {
+    setEmail(e.target.value);
   };
 
   const handlePasswordChange = (e) => {
@@ -26,20 +24,41 @@ const Login=()=> {
     setRememberMe(e.target.checked);
   };
 
-  const handleForgotPassword=()=>{
+  const handleForgotPassword = () => {
     navigate("/forgotPassword");
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     // Add your form submission logic here
-    // if (!users) return alert("Invalid username and password");
-      if (username === "rohit" && password === "rohit123") {
-        alert("login successfully");
-        navigate("/calendar");
-        return;
-      }
-    alert("Invalid username and password");
+    // // if (!users) return alert("Invalid username and password");
+    //   if (username === "rohit" && password === "rohit123") {
+    //     alert("login successfully");
+    //     navigate("/calendar");
+    //     return;
+    //   }
+    // alert("Invalid username and password");
+
+
+    const res = await fetch('http://localhost:8000/api/user/login', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      withCredentials: true,
+      credentials:'include',
+      body: JSON.stringify({ email, password })
+    });
+
+    const data = await res.json();
+
+    if(!data.success){
+      alert("Invalid username and password");
+      return;
+    }
+    
+    alert("login successfully");
+    navigate("/calendar");
   };
 
   return (
@@ -50,7 +69,7 @@ const Login=()=> {
           <div className="login-box">
             <form className="login-form" onSubmit={handleSubmit}>
               <div className="logo-wrapper">
-                <img src="../images/logo.svg" alt="Rishabh Software" />
+                <img src="/images/logo.svg" alt="Rishabh Software" />
                 <span>Meal Facility</span>
               </div>
               <h3 className="login-head">Sign in to your account</h3>
@@ -63,8 +82,8 @@ const Login=()=> {
                     type="text"
                     placeholder="Robert Smith"
                     autoFocus
-                    value={username}
-                    onChange={handleUsernameChange}
+                    value={email}
+                    onChange={handleemailChange}
                   />
                   <div className="icon-after icon-green"><i className="icon-check"></i></div>
                 </div>

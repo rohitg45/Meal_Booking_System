@@ -39,9 +39,9 @@ const Header = () => {
                   <Link className="nav-link active" aria-current="page" to="/calendar">Calendar</Link>
                 </li>
                 <li className="nav-item">
-                  <Link className="nav-link" to="/calendar">Booking List</Link>
+                  <Link className="nav-link" to="/booking">Booking List</Link>
                 </li>
-                <li className="nav-item">
+                <li className="nav-item"> 
                   <Link className="nav-link" to="/addEmployee">Add User</Link>
                 </li>
               </ul>

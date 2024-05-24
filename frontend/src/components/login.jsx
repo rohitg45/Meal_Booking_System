@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
-import { useNavigate } from "react-router-dom";
+import { useNavigate ,Link} from "react-router-dom";
+
 
 const Login = () => {
   const navigate = useNavigate();
@@ -118,7 +119,7 @@ const Login = () => {
                 </div>
                 <div className="form-group mb-0">
                   <div className="utility">
-                    <p><a href="#" className="form-link" onClick={handleForgotPassword}>Forgot Password?</a></p>
+                    <p><Link to="#" className="form-link" onClick={handleForgotPassword}>Forgot Password?</Link></p>
                   </div>
                 </div>
               </div>

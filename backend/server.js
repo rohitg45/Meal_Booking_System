@@ -3,8 +3,8 @@
 // const userRoute = require('./routes/UserRoute.js');
 import express from "express";
 import connectDB from "./db/connection.js";
-// import appRoute from "./routes/route.js"
 import userRoute from "./routes/UserRoute.js"
+import bookingRoute from "./routes/bookingRoute.js"
 import cors from "cors"
 import cookieParser from "cookie-parser"
 
@@ -28,6 +28,7 @@ app.use(express.json());
 /** routes */
 // app.use('/api', appRoute);
 app.use('/api/user', userRoute);
+app.use('/api/booking', bookingRoute);
 
 app.listen(PORT, () => {
     console.log(`Server is running on http://localhost:${PORT}`)

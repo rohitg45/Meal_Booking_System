@@ -3,10 +3,15 @@ import { useNavigate } from "react-router-dom";
 
 const ChangePassword = () => {
   const navigate = useNavigate();
+  const [showPassword, setShowPassword] = useState(false);
   const [oldPassword, setOldPassword] = useState('');
   const [newPassword, setNewPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
 
+  const togglePasswordVisibility = () => {
+    setShowPassword(!showPassword);
+  };
+  
   const handleOldPasswordChange = (e) => {
     setOldPassword(e.target.value);
   };
@@ -41,33 +46,51 @@ const ChangePassword = () => {
               <h3 className="login-head">Change Password</h3>
               <div className="form-group">
                 <label className="control-label">Old Password</label>
-                <input
-                  className="form-control"
-                  type="password"
-                  value={oldPassword}
-                  onChange={handleOldPasswordChange}
-                  required
-                />
+                <div className="input-addon">
+                  <input
+                    id="password-field"
+                    className="form-control"
+                    type={showPassword ? "text" : "password"}
+                    value={oldPassword}
+                    onChange={handleOldPasswordChange}
+                  />
+                  <span
+                    className={showPassword ? "icon-eye-open field-icon toggle-password" : "icon-eye-close field-icon toggle-password"}
+                    onClick={togglePasswordVisibility}
+                  ></span>
+                  </div>
               </div>
               <div className="form-group">
                 <label className="control-label">New Password</label>
-                <input
-                  className="form-control"
-                  type="password"
-                  value={newPassword}
-                  onChange={handleNewPasswordChange}
-                  required
-                />
+                <div className="input-addon">
+                  <input
+                    id="password-field"
+                    className="form-control"
+                    type={showPassword ? "text" : "password"}
+                    value={newPassword}
+                    onChange={handleNewPasswordChange}
+                  />
+                  <span
+                    className={showPassword ? "icon-eye-open field-icon toggle-password" : "icon-eye-close field-icon toggle-password"}
+                    onClick={togglePasswordVisibility}
+                  ></span>
+                  </div>
               </div>
               <div className="form-group">
                 <label className="control-label">Confirm Password</label>
-                <input
-                  className="form-control"
-                  type="password"
-                  value={confirmPassword}
-                  onChange={handleConfirmPasswordChange}
-                  required
-                />
+                <div className="input-addon">
+                  <input
+                    id="password-field"
+                    className="form-control"
+                    type={showPassword ? "text" : "password"}
+                    value={confirmPassword}
+                    onChange={handleConfirmPasswordChange}
+                  />
+                  <span
+                    className={showPassword ? "icon-eye-open field-icon toggle-password" : "icon-eye-close field-icon toggle-password"}
+                    onClick={togglePasswordVisibility}
+                  ></span>
+                  </div>
               </div>
               <div className="form-group btn-container">
                 <button className="btn btn-xl btn-primary"> Change Password</button>

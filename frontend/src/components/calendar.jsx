@@ -1,24 +1,52 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Link } from "react-router-dom";
 import Header from './header';
 import Footer from './footer';
+import { Calendar as BigCalendar, momentLocalizer } from 'react-big-calendar';
+import moment from 'moment';
+import 'react-big-calendar/lib/css/react-big-calendar.css';
 
+const localizer = momentLocalizer(moment);
 
 const Calendar = () => {
+  // Sample events for the calendar
+  const [events, setEvents] = useState([
+    {
+      id: 0,
+      title: 'Board meeting',
+      start: new Date(2023, 5, 29, 10, 0), // June 29, 2023, 10:00 AM
+      end: new Date(2023, 5, 29, 12, 0),   // June 29, 2023, 12:00 PM
+    },
+    {
+      id: 1,
+      title: 'Birthday Party',
+      start: new Date(2023, 5, 30, 19, 0), // June 30, 2023, 7:00 PM
+      end: new Date(2023, 5, 30, 21, 0),   // June 30, 2023, 9:00 PM
+    },
+    // Add more events here
+  ]);
 
   return (
     <div>
       {/* Navbar */}
-      <Header/>
+      <Header />
       {/* Navbar End */}
-      
+
       <div className="container-fluid">
         <div className="calendar-wrapper">
           <div className="container">
             <h3 className="main-title">Calendar</h3>
             <div className="row">
               <div className="col-lg-9">
-                <div className="tile">Calendar</div>
+                <div className="tile">
+                  <BigCalendar
+                    localizer={localizer}
+                    events={events}
+                    startAccessor="start"
+                    endAccessor="end"
+                    style={{ height: 500 }}
+                  />
+                </div>
               </div>
               <div className="col-lg-3">
                 <div className="tile">
@@ -64,16 +92,13 @@ const Calendar = () => {
             </div>
           </div>
         </div>
-
       </div>
 
- {/* Footer */}
- <Footer/>
+      {/* Footer */}
+      <Footer />
       {/* Footer End */}
-     
     </div>
   );
 }
 
 export default Calendar;
-

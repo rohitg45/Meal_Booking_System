@@ -87,7 +87,8 @@ const BookingContent = () => {
   };
 
   return (
-    <div className="py-5 my-5  ">
+    // <div className="py-5 my-5  ">
+    <div>
     <div className="container-fluid">
       <div className="container pt-30 mb-30">
         <div className="container-head">
@@ -152,9 +153,9 @@ const BookingContent = () => {
                 <div className="form-group">
                   <label>Select Date(s)</label>
                   <div className="input-group date-picker-input">
-                    <input type="text" className="form-control border-right-0" placeholder="Select Date" name="date" value={form.date} onChange={handleChange} />
+                    <input type="datetime-local" className="form-control border-right-0" placeholder="Select Date" name="date" value={form.date} onChange={handleChange} />
                     <div className="input-group-append bg-transparent">
-                      <span className="input-group-text bg-transparent" id="basic-addon2"><i className="icon-calendar"></i></span>
+                      {/* <span className="input-group-text bg-transparent" id="basic-addon2"><i className="icon-calendar"></i></span> */}
                     </div>
                   </div>
                 </div>

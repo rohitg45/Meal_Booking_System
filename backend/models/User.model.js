@@ -6,6 +6,10 @@ configDotenv();
 
 const userSchema = new Schema(
     {
+        userId: {
+            type: String,
+            required: true,
+        },
         firstName: {
             type: String,
             required: true,
@@ -32,6 +36,10 @@ const userSchema = new Schema(
         password: {
             type: String,
             trim: true,
+            required: true
+        },
+        departmentId: {
+            type: Number,
             required: true
         }
     }

@@ -1,20 +1,18 @@
 import { User } from "../models/User.model.js";
 import { ApiResponse } from "../utils/ApiResponse.js";
 import { sendMail } from "../utils/SendMail.js";
+import { getNextSequenceValue } from "../utils/functions.js";
 
 const registerUser = async (req, res) => {
 
-    const { firstName, lastName, email, mobileNumber } = req.body
-    //console.log("email: ", email);
+    const { firstName, lastName, email, mobileNumber, departmentId } = req.body
 
-    if (
-        [firstName, lastName, email, mobileNumber].some((field) => field?.trim() === "")
-    ) {
+    if(!firstName || !lastName || !email || !mobileNumber || !departmentId){
         return res.status(400).json(
             new ApiResponse(400, {}, "All fields are required")
         )
     }
-
+   
     const existedUser = await User.findOne({ email })
 
     if (existedUser) {
@@ -23,12 +21,16 @@ const registerUser = async (req, res) => {
         )
     }
 
+    const UID= await getNextSequenceValue("userId");
+
     const user = new User({
+        userId: "EMP_" + UID,
         firstName,
         lastName,
         email,
         mobileNumber,
-        password: generatePassword()
+        password: generatePassword(),
+        departmentId
     })
 
     let registeredUser = await user.save();
@@ -50,8 +52,6 @@ const registerUser = async (req, res) => {
     return res.status(201).json(
         new ApiResponse(201, registeredUser, "User registered Successfully")
     )
-
-
 };
 
 function generatePassword() {
@@ -168,4 +168,42 @@ const forgotPassword = async(req,res)=>{
         new ApiResponse(201,{}, "Email Send Successfully")
     )
 }
-export { registerUser, loginUser, logoutUser,forgotPassword };
+
+const getAllUsers = async (req, res) => {
+    try {
+      const users = await User.aggregate([
+        {
+            $lookup:
+              {
+                from: "departments",
+                localField: "departmentId",
+                foreignField: "deptId",
+                as: "department"
+              }
+         },
+         {
+            $unwind:"$department"
+         },
+         {
+            $project: {
+                _id:1,
+                userId:1,
+                firstName:1,
+                lastName:1,
+                email:1,
+                mobileNumber:1,
+                departmentId:1,
+                department:'$department.deptName'
+            }
+         }
+    ]);
+      return res.status(201).json(
+        new ApiResponse(201, users, "Users data fetched Successfully")
+    )
+    } catch (err) {
+        return res.status(500).json(
+            new ApiResponse(500, {}, "Error! while fetching users.")
+        )
+    }
+  };
+export { registerUser, loginUser, logoutUser,forgotPassword,getAllUsers };

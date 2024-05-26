@@ -42,7 +42,7 @@ const Header = () => {
                   <Link className="nav-link" to="/booking">Booking List</Link>
                 </li>
                 <li className="nav-item"> 
-                  <Link className="nav-link" to="/addEmployee">Add User</Link>
+                  <Link className="nav-link" to="/userList">Users List</Link>
                 </li>
               </ul>
               <div className="h-100 d-lg-inline-flex align-items-center">
@@ -54,6 +54,7 @@ const Header = () => {
                     </Link>
                   </li>
                   {/* User Menu */}
+
                   <li className="dropdown">
                     <Link className="app-nav__item dropdown-toggle" to="#" data-toggle="dropdown" aria-label="Open Profile Menu">Admin</Link>
                     <ul className="dropdown-menu settings-menu dropdown-menu-right">

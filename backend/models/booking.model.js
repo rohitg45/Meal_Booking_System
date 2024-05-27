@@ -16,7 +16,7 @@ const BookingSchema = new Schema({
     required: true,
   },
   department: {
-    type: String,
+    type: Number,
     required: true,
   },
   notes: {
@@ -29,8 +29,7 @@ const BookingSchema = new Schema({
   },
   selectedEmployees: [
     {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: 'User',
+      type: String
     },
   ],
 });

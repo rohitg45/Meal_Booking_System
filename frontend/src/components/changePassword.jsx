@@ -11,7 +11,7 @@ const ChangePassword = () => {
   const togglePasswordVisibility = () => {
     setShowPassword(!showPassword);
   };
-  
+
   const handleOldPasswordChange = (e) => {
     setOldPassword(e.target.value);
   };
@@ -37,69 +37,67 @@ const ChangePassword = () => {
   };
 
   return (
-    <div className="App">
-      <section className="login-content">
-        <div className="login-content-lt"></div>
-        <div className="login-content-rt">
-          <div className="login-box">
-            <form className="login-form" onSubmit={handleSubmit}>
-              <h3 className="login-head">Change Password</h3>
-              <div className="form-group">
-                <label className="control-label">Old Password</label>
-                <div className="input-addon">
-                  <input
-                    id="password-field"
-                    className="form-control"
-                    type={showPassword ? "text" : "password"}
-                    value={oldPassword}
-                    onChange={handleOldPasswordChange}
-                  />
-                  <span
-                    className={showPassword ? "icon-eye-open field-icon toggle-password" : "icon-eye-close field-icon toggle-password"}
-                    onClick={togglePasswordVisibility}
-                  ></span>
-                  </div>
+    <section className="login-content">
+      <div className="login-content-lt"></div>
+      <div className="login-content-rt">
+        <div className="login-box">
+          <form className="login-form" onSubmit={handleSubmit}>
+            <h3 className="login-head">Change Password</h3>
+            <div className="form-group">
+              <label className="control-label">Old Password</label>
+              <div className="input-addon">
+                <input
+                  id="password-field"
+                  className="form-control"
+                  type={showPassword ? "text" : "password"}
+                  value={oldPassword}
+                  onChange={handleOldPasswordChange}
+                />
+                <span
+                  className={showPassword ? "icon-eye-open field-icon toggle-password" : "icon-eye-close field-icon toggle-password"}
+                  onClick={togglePasswordVisibility}
+                ></span>
               </div>
-              <div className="form-group">
-                <label className="control-label">New Password</label>
-                <div className="input-addon">
-                  <input
-                    id="password-field"
-                    className="form-control"
-                    type={showPassword ? "text" : "password"}
-                    value={newPassword}
-                    onChange={handleNewPasswordChange}
-                  />
-                  <span
-                    className={showPassword ? "icon-eye-open field-icon toggle-password" : "icon-eye-close field-icon toggle-password"}
-                    onClick={togglePasswordVisibility}
-                  ></span>
-                  </div>
+            </div>
+            <div className="form-group">
+              <label className="control-label">New Password</label>
+              <div className="input-addon">
+                <input
+                  id="password-field"
+                  className="form-control"
+                  type={showPassword ? "text" : "password"}
+                  value={newPassword}
+                  onChange={handleNewPasswordChange}
+                />
+                <span
+                  className={showPassword ? "icon-eye-open field-icon toggle-password" : "icon-eye-close field-icon toggle-password"}
+                  onClick={togglePasswordVisibility}
+                ></span>
               </div>
-              <div className="form-group">
-                <label className="control-label">Confirm Password</label>
-                <div className="input-addon">
-                  <input
-                    id="password-field"
-                    className="form-control"
-                    type={showPassword ? "text" : "password"}
-                    value={confirmPassword}
-                    onChange={handleConfirmPasswordChange}
-                  />
-                  <span
-                    className={showPassword ? "icon-eye-open field-icon toggle-password" : "icon-eye-close field-icon toggle-password"}
-                    onClick={togglePasswordVisibility}
-                  ></span>
-                  </div>
+            </div>
+            <div className="form-group">
+              <label className="control-label">Confirm Password</label>
+              <div className="input-addon">
+                <input
+                  id="password-field"
+                  className="form-control"
+                  type={showPassword ? "text" : "password"}
+                  value={confirmPassword}
+                  onChange={handleConfirmPasswordChange}
+                />
+                <span
+                  className={showPassword ? "icon-eye-open field-icon toggle-password" : "icon-eye-close field-icon toggle-password"}
+                  onClick={togglePasswordVisibility}
+                ></span>
               </div>
-              <div className="form-group btn-container">
-                <button className="btn btn-xl btn-primary"> Change Password</button>
-              </div>
-            </form>
-          </div>
+            </div>
+            <div className="form-group btn-container">
+              <button className="btn btn-xl btn-primary"> Change Password</button>
+            </div>
+          </form>
         </div>
-      </section>
-    </div>
+      </div>
+    </section>
   );
 }
 

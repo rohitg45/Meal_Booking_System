@@ -27,7 +27,7 @@ const Calendar = () => {
   ]);
 
   return (
-    <div>
+    <>
       {/* Navbar */}
       <Header />
       {/* Navbar End */}
@@ -97,7 +97,7 @@ const Calendar = () => {
       {/* Footer */}
       <Footer />
       {/* Footer End */}
-    </div>
+    </>
   );
 }
 

@@ -12047,13 +12047,13 @@ fieldset[disabled] .datepicker table tr td span.active.disabled:hover.focus {
 /*========================== custom checkbox end ===============================*/
 body {
   background-color: #FFF;
-  margin: 80px auto 0 auto;
+  margin: 80px auto 0 auto !important;
   width: 100%;
 }
 
-/* .login-content{
+.login-content{
   margin-top: -80px;
-} */
+}
 
 img {
   max-width: 100%;

@@ -1,7 +1,8 @@
 import { Booking } from "../models/booking.model.js";
+import { ApiResponse } from "../utils/ApiResponse.js";
 
 const createBooking = async (req, res) => {
-  const {  category, mealType, date, department, notes, bookingCount, selectedEmployees, weekend } = req.body;
+  const {  category, mealType, date, department, notes, bookingCount, selectedEmployees } = req.body;
 
   const booking = new Booking({
     category,
@@ -10,15 +11,14 @@ const createBooking = async (req, res) => {
     department,
     notes,
     bookingCount,
-    selectedEmployees,
-    weekend
+    selectedEmployees
   });
 
   try {
     const newBooking = await booking.save();
-    res.status(201).json(newBooking);
+    return res.status(201).json(new ApiResponse(201, {}, "Booking Successfully"));
   } catch (err) {
-    res.status(400).json({ message: err.message });
+    return res.status(500).json(new ApiResponse(500, {}, "Error while Booking"));
   }
 };
 

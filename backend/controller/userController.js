@@ -170,8 +170,15 @@ const forgotPassword = async(req,res)=>{
 }
 
 const getAllUsers = async (req, res) => {
+    const conditon = {};
+    if(req.query.departmentId){
+        conditon.departmentId = +req.query.departmentId
+    }
     try {
       const users = await User.aggregate([
+        {
+            $match: conditon
+        },
         {
             $lookup:
               {

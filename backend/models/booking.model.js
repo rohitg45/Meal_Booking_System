@@ -17,7 +17,6 @@ const BookingSchema = new Schema({
   },
   department: {
     type: Number,
-    required: true,
   },
   notes: {
     type: String,

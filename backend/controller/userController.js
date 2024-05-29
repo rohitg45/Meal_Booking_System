@@ -139,6 +139,68 @@ const logoutUser = async (req, res) => {
     .json(new ApiResponse(200, {}, "User logged Out"))
 }
 
+const deleteUser = async (req, res) => {
+    const userId = req.params.userId;
+    if(!userId){
+        return res.status(401).json(
+            new ApiResponse(401, {}, "User Id is required to delete user")
+        )
+    }
+    try {
+        const user = await User.findOne({userId});
+
+        if(!user){
+            return res.status(404).json(
+                new ApiResponse(404, {}, "User not found with Id: "+userId)
+            )
+        }
+
+        await User.deleteOne({userId});
+
+        return res.status(200).json(
+            new ApiResponse(200, {}, "User deleted with Id: "+userId)
+        )
+
+      } catch (err) {
+          return res.status(500).json(
+              new ApiResponse(500, {}, "Error! while deleting user.")
+          )
+      }
+}
+
+const updateUser = async(req, res)=>{
+    const userId = req.params.userId;
+    
+    const { firstName, lastName, email, mobileNumber, departmentId } = req.body
+
+    if(!userId || !firstName || !lastName || !email || !mobileNumber || !departmentId){
+        return res.status(400).json(
+            new ApiResponse(400, {}, "All fields are required")
+        )
+    }
+    try {
+        const user = await User.findOne({userId});
+
+        if(!user){
+            return res.status(404).json(
+                new ApiResponse(404, {}, "User not found with Id: "+userId)
+            )
+        }
+    
+        await User.updateOne({userId}, {
+            firstName, lastName, email, mobileNumber, departmentId: +departmentId
+        });
+    
+        return res.status(201).json(
+            new ApiResponse(201, {userId, firstName, lastName, email, mobileNumber, departmentId: +departmentId}, "User updated Successfully")
+        )
+    } catch (error) {
+        return res.status(500).json(
+            new ApiResponse(500, {}, "Something went wrong while updating the user")
+        )
+    }
+}
+
 const forgotPassword = async(req,res)=>{
     const { email } = req.body;
 
@@ -213,4 +275,4 @@ const getAllUsers = async (req, res) => {
         )
     }
   };
-export { registerUser, loginUser, logoutUser,forgotPassword,getAllUsers };
+export { registerUser, loginUser, logoutUser,forgotPassword,getAllUsers, deleteUser, updateUser };

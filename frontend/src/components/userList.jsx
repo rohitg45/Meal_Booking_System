@@ -23,11 +23,17 @@ const Userdata = () => {
       .then((response) => setDepartments(response.data.data))
       .catch((err) => console.log(err));
 
+      getUser();
+  }, []);
+
+  const getUser = ()=>{
     axios
       .get(`http://localhost:8000/api/user/getUser`)
       .then((response) => setUsers(response.data.data))
       .catch((err) => console.log(err));
-  }, []);
+  }
+
+  const [editUserID, setEditUserID] = useState(null);
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -35,7 +41,7 @@ const Userdata = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-
+    
     // Send email with random password
     const newUser = {
       firstName: formData.firstName,
@@ -45,33 +51,73 @@ const Userdata = () => {
       departmentId: +formData.deptId,
     };
 
-    // console.log(newUser);
-    // return;
-
-    const res = await fetch("http://localhost:8000/api/user/addUser", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      withCredentials: true,
-      credentials: "include",
-      body: JSON.stringify(newUser),
-    });
-
-    const data = await res.json();
-
-    if (!data.success) {
-      alert(data.message);
-      return;
+    // Update User
+    if(editUserID){
+      axios.put(`http://localhost:8000/api/user/updateUser/${editUserID}`, newUser, { 
+        headers: {'Content-Type': 'application/json'} 
+      })
+      .then(res=> getUser())
+      .catch(err => alert(err))
     }
-
-    alert("User created successfully! check your mail!");
-    navigate("/userList");
-    // await axios.post('/employees', formData);
-    // await axios.post('/send-email', emailData);
-
+    // Add User
+    else{
+      const res = await fetch("http://localhost:8000/api/user/addUser", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        withCredentials: true,
+        credentials: "include",
+        body: JSON.stringify(newUser),
+      });
+  
+      const data = await res.json();
+  
+      if (!data.success) {
+        alert(data.message);
+        return;
+      }
+      getUser();
+      alert("User created successfully! check your mail!");
+    }
   };
 
+  const deleteUser = (userId)=>{
+    if(window.confirm("Do you want to delete this User with ID: "+userId)){ 
+    axios
+      .delete(`http://localhost:8000/api/user/deleteUser/${userId}`)
+      .then((response) => {
+        getUser();
+        alert(response.data.message)
+      })
+      .catch((err) => console.log(err));
+    }
+  }
+  const editUser = (editUserId)=>{
+    for(const user of users){
+      if(user.userId === editUserId){
+        setFormData({
+          firstName: user.firstName,
+          lastName: user.lastName,
+          email: user.email,
+          phone: user.mobileNumber,
+          deptId: user.departmentId
+        });
+        break;
+      }
+    }
+    setEditUserID(editUserId);
+  }
+  const resetForm = (userId)=>{
+    setFormData({
+      firstName: "",
+      lastName: "",
+      email: "",
+      phone: "",
+      deptId: "",
+    });
+  }
+  
   return (
     <div className="container-fluid">
       <div className="container pt-30 mb-30">
@@ -84,19 +130,20 @@ const Userdata = () => {
               className="btn btn-primary"
               data-toggle="modal"
               data-target="#addBookingModal"
+              onClick={()=> setEditUserID(null)}
             >
               Add User
             </button>
           </div>
         </div>
-        <div className="content-tab">
+        {/* <div className="content-tab">
           <a className="content-tab_link active" href="#">
             Rishabh Employees
           </a>
           <a className="content-tab_link" href="#">
             Others
           </a>
-        </div>
+        </div> */}
       </div>
 
       {/* User table list */}
@@ -109,6 +156,7 @@ const Userdata = () => {
               <th>Email</th>
               <th>Phone No.</th>
               <th>Department</th>
+              <th>Action</th>
             </tr>
           </thead>
 
@@ -120,6 +168,11 @@ const Userdata = () => {
                 <td>{user.email}</td>
                 <td>{user.mobileNumber}</td>
                 <td>{user.department}</td>
+                <td>
+                  <button data-toggle="modal" data-target="#addBookingModal" 
+                  onClick={()=> editUser(user.userId)}>Edit</button>
+                  <button onClick={()=> deleteUser(user.userId)}>Delete</button>
+                </td>
               </tr>
             ))}
           </tbody>
@@ -140,7 +193,7 @@ const Userdata = () => {
           <div className="modal-content">
             <div className="modal-header">
               <h5 className="modal-title" id="exampleModalLabel">
-                Add User
+                { editUserID ? "Edit User" : "Add User"}
               </h5>
               <button
                 type="button"
@@ -148,7 +201,7 @@ const Userdata = () => {
                 data-dismiss="modal"
                 aria-label="Close"
               >
-                <span aria-hidden="true">×</span>
+                <span aria-hidden="true" onClick={resetForm}>×</span>
               </button>
             </div>
             <div className="modal-body">
@@ -208,6 +261,7 @@ const Userdata = () => {
                     name="deptId"
                     onChange={handleChange}
                     required
+                    value={formData.deptId}
                   >
                     <option value="" selected disabled>
                       Select
@@ -221,11 +275,12 @@ const Userdata = () => {
                 </div>
 
                 <div className="modal-footer">
-                  <button type="button" className="btn btn-outline-primary">
-                    Cancel
+                  <button type="reset" className="btn btn-outline-primary" data-dismiss="modal"
+                  onClick={resetForm}>
+                    Reset
                   </button>
                   <button type="submit" className="btn btn-primary">
-                    Book
+                    { editUserID ? "Edit User" : "Add User"}
                   </button>
                 </div>
               </form>

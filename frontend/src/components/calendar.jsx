@@ -8,20 +8,27 @@ import 'react-big-calendar/lib/css/react-big-calendar.css';
 
 const localizer = momentLocalizer(moment);
 
+const getCircles = (employees, nonEmployees, customBooking )=>{
+return <>
+<span className='circle emp'>{employees}</span>
+<span className='circle nemp'>{nonEmployees}</span>
+<span className='circle cb'>{customBooking}</span>
+</>
+}
 const Calendar = () => {
   // Sample events for the calendar
   const [events, setEvents] = useState([
     {
       id: 0,
-      title: 'Board meeting',
-      start: new Date(2023, 5, 29, 10, 0), // June 29, 2023, 10:00 AM
-      end: new Date(2023, 5, 29, 12, 0),   // June 29, 2023, 12:00 PM
+      title: getCircles(100,130, 50),
+      start: new Date(2024, 4, 29, 10, 0), // June 29, 2023, 10:00 AM
+      end: new Date(2024, 4, 29, 12, 0),   // June 29, 2023, 12:00 PM
     },
     {
       id: 1,
-      title: 'Birthday Party',
-      start: new Date(2023, 5, 30, 19, 0), // June 30, 2023, 7:00 PM
-      end: new Date(2023, 5, 30, 21, 0),   // June 30, 2023, 9:00 PM
+      title: getCircles(111, 453, 33),
+      start: new Date(2024, 4, 31, 19, 0), // June 30, 2023, 7:00 PM
+      end: new Date(2024, 4, 31, 21, 0),   // June 30, 2023, 9:00 PM
     },
     // Add more events here
   ]);
@@ -42,6 +49,7 @@ const Calendar = () => {
                   <BigCalendar
                     localizer={localizer}
                     events={events}
+                    defaultDate={new Date()}
                     startAccessor="start"
                     endAccessor="end"
                     style={{ height: 500 }}

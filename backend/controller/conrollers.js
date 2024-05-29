@@ -37,7 +37,7 @@ const getDepartments = async (req, res) => {
       const departments = await Department.find();
       return res.status(201).json(
         new ApiResponse(201, departments, "Department fetched Successfully")
-    )
+      )
     } catch (err) {
         return res.status(500).json(
             new ApiResponse(500, {}, "Error! while fetching department.")

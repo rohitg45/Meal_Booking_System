@@ -1,0 +1,37 @@
+.rbc-event{
+    /* border: none;
+    box-sizing: border-box;
+    box-shadow: none;
+    margin: 0;
+    padding: 2px 5px; */
+    background:none !important;
+    /* border-radius: 5px;
+    color: #fff;
+    cursor: pointer;
+    width: 100%;
+    text-align: left; */
+}
+
+.circle{
+    display: inline-block;
+    height: 26px;
+    width: 26px;
+    text-align: center;
+    line-height: 26px;
+    border-radius: 50%;
+    color: #fff;
+    font-size: 10px;
+    margin-top: 10px;
+    margin-right: 1px;
+    background-color: steelblue;
+}
+
+.circle.emp{
+    background-color: #7A58BF !important;
+}
+.circle.nemp{
+    background-color: #E2553E !important;
+}
+.circle.cb{
+    background-color: #6FCB1F !important;
+}

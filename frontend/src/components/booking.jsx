@@ -6,12 +6,11 @@ import Footer from "./footer";
 
 const BookingContent = () => {
   const navigate = useNavigate();
-  // const [bookings, setBookings] = useState([]);
   const [form, setForm] = useState({
     category: "Employees",
     mealType: "Lunch",
     date: "",
-    deptId: -1,
+    deptId: "",
     notes: "",
     bookingCount: 1,
     employees: [],
@@ -19,6 +18,9 @@ const BookingContent = () => {
 
   const [users, setUsers] = useState([]);
   const [departments, setDepartments] = useState([]);
+  const [employeesBookings, setEmployeesBookings] = useState([]);
+  const [nonEmployeesBookings, setNonEmployeesBookings] = useState([]);
+  const [customBookings, setCustomBookings] = useState([]);
 
   useEffect(() => {
     axios
@@ -30,34 +32,65 @@ const BookingContent = () => {
       .get(`http://localhost:8000/api/user/getUser`)
       .then((response) => setUsers(response.data.data))
       .catch((err) => console.log(err));
+
+    getBookings();
   }, []);
+
+  const getBookings = async () => {
+    try {
+      let response = await axios.get('http://localhost:8000/api/booking/getBookings',{
+        params: { category: "Employees"} 
+      });
+      setEmployeesBookings(response.data.data);
+
+      response = await axios.get('http://localhost:8000/api/booking/getBookings?category=Non Employees');
+      setNonEmployeesBookings(response.data.data);
+      
+      response = await axios.get('http://localhost:8000/api/booking/getBookings?category=Custom Booking');
+      setCustomBookings(response.data.data);  
+    } catch (error) {
+      console.log("Error while getting bookings: ", error);
+    } 
+  }
 
   useEffect(() => {
     axios
       .get(`http://localhost:8000/api/user/getUser`,
         {
-          params: { departmentId: +form.deptId},
+          params: { departmentId: +form.deptId },
         }
       )
       .then((response) => setUsers(response.data.data))
       .catch((err) => console.log(err));
   }, [form]);
 
+  const [categoryType, setCategoryType] = useState("");
+
   const handleChange = (e) => {
     const { name, value } = e.target;
     setForm({ ...form, [name]: value });
+
+    if (name === "category" && (value === "Non Employees" || value === "Custom Booking")) {
+      setCategoryType(value);
+    }
   };
 
-  const handleCheckBoxChange=  (e) => {
-    const {value, checked } = e.target;
-    if(checked)
-    setForm({ ...form, employees: [...form.employees, value] });
+  const handleCheckBoxChange = (e) => {
+    const { value, checked } = e.target;
+    if (checked)
+      setForm({ ...form, employees: [...form.employees, value] });
     else
-    setForm({ ...form, employees: form.employees.filter(emp => emp !== value)});
+      setForm({ ...form, employees: form.employees.filter(emp => emp !== value) });
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    const { name, value } = e.target;
+
+    if (form.employees.length == 0 && (name === "category" && (value === "Non Employees"))) {
+      alert("Please select employees");
+      return;
+    }
 
     const newBooking = {
       category: form.category,
@@ -89,12 +122,39 @@ const BookingContent = () => {
       }
 
       alert(res.data.message);
-      navigate("/booking");
+      getBookings();
+      resetForm();
     } catch (error) {
       // console.error('Error submitting form:', error);
       // alert('Error submitting form');
       alert(error);
     }
+  };
+
+  const resetForm = (userId) => {
+    setForm({
+      category: "Employees",
+      mealType: "Lunch",
+      date: "",
+      deptId: "",
+      notes: "",
+      bookingCount: 1,
+      employees: [],
+    });
+  }
+
+  const formatDate = (dateString) => {
+    const date = new Date(dateString);
+    return date.toLocaleString("en-US", {
+      weekday: "long",
+      year: "numeric",
+      month: "long",
+      day: "numeric",
+      hour: "numeric",
+      minute: "numeric",
+      second: "numeric",
+      timeZone: "UTC",
+    });
   };
 
   return (
@@ -114,42 +174,113 @@ const BookingContent = () => {
             </button>
           </div>
         </div>
-        <div className="content-tab">
+        {/* <div className="content-tab">
           <a className="content-tab_link active" href="#">
             Rishabh Employees
           </a>
           <a className="content-tab_link" href="#">
             Others
           </a>
+        </div> */}
+        <div className="content-tab d-inline">
+          <ul className="nav nav-tabs" id="myTab" role="tablist">
+            <li className="nav-item" role="presentation">
+              <button
+                className="nav-link active"
+                id="home-tab"
+                data-bs-toggle="tab"
+                data-bs-target="#employees"
+                type="button"
+                role="tab"
+                aria-controls="employees"
+                aria-selected="true"
+              >
+                Employees
+              </button>
+            </li>
+            <li className="nav-item" role="presentation">
+              <button
+                className="nav-link"
+                id="profile-tab"
+                data-bs-toggle="tab"
+                data-bs-target="#others"
+                type="button"
+                role="tab"
+                aria-controls="others"
+                aria-selected="false"
+              >
+                others
+              </button>
+            </li>
+          </ul>
+          <div className="tab-content" id="myTabContent">
+            <div
+              className="tab-pane fade show active"
+              id="employees"
+              role="tabpanel"
+              aria-labelledby="home-tab"
+            >
+              <table className="table table-hover responsive nowrap table-bordered">
+                <thead>
+                  <tr>
+                    <th>Employee ID</th>
+                    <th>Employee Name</th>
+                    <th>DEPARTMENT</th>
+                    <th>MEAL TYPE</th>
+                    <th>TOTAL MEAL BOOKED</th>
+                    <th>MEAL DATES</th>
+                  </tr>
+                </thead>
+
+                <tbody>
+                  {employeesBookings?.map((booking, i) => (
+                    <tr key={i}>
+                      <td>{
+                        booking.selectedEmployees.map(empId => <div>{empId}</div>)
+                      }</td>
+                      <td>{
+                        booking.users.map(user => <div>{user.firstName + " " + user.lastName}</div>)
+                      }</td>
+                      <td>{booking.department.deptName}</td>
+                      <td>{booking.mealType}</td>
+                      <td>{booking.bookingCount}</td>
+                      <td>{formatDate(booking.date)}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+            <div
+              className="tab-pane fade"
+              id="others"
+              role="tabpanel"
+              aria-labelledby="profile-tab"
+            >
+              <table className="table table-hover responsive nowrap table-bordered">
+                <thead>
+                  <tr>
+                    <th>Category</th>
+                    <th>Meal type</th>
+                    <th>Date</th>
+                    <th>Notes</th>
+                    <th>Booking Count</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {[...nonEmployeesBookings,...customBookings].map((i) => (
+                    <tr key={i._id}>
+                      <td>{i.category}</td>
+                      <td>{i.mealType}</td>
+                      <td>{formatDate(i.date)}</td>
+                      <td>{i.notes}</td>
+                      <td>{i.bookingCount}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </div>
         </div>
-      </div>
-
-      {/* User table list */}
-      <div className="container">
-        <table className="table table-hover responsive nowrap table-bordered">
-          <thead>
-            <tr>
-              <th>Employee ID</th>
-              <th>Employee Name</th>
-              <th>DEPARTMENT</th>
-              <th>MEAL TYPE</th>
-              <th>TOTAL MEAL BOOKED</th>
-              <th>MEAL DATES</th>
-            </tr>
-          </thead>
-
-          <tbody>
-            {users?.map((user, i) => (
-              <tr key={i}>
-                <td>{user.userId}</td>
-                <td>{user.firstName + " " + user.lastName}</td>
-                <td>{user.email}</td>
-                <td>{user.mobileNumber}</td>
-                <td>{user.department}</td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
       </div>
 
       <div
@@ -171,7 +302,7 @@ const BookingContent = () => {
                 data-dismiss="modal"
                 aria-label="Close"
               >
-                <span aria-hidden="true">×</span>
+                <span aria-hidden="true" onClick={resetForm}>×</span>
               </button>
             </div>
             <div className="modal-body">
@@ -260,36 +391,40 @@ const BookingContent = () => {
                   <label>Select Date(s)</label>
                   <div className="input-group date-picker-input">
                     <input
-                      type="datetime-local"
+                      type="date"
                       className="form-control border-right-0"
                       placeholder="Select Date"
                       name="date"
                       value={form.date}
                       onChange={handleChange}
+                      required
                     />
                     <div className="input-group-append bg-transparent">
                       {/* <span className="input-group-text bg-transparent" id="basic-addon2"><i className="icon-calendar"></i></span> */}
                     </div>
                   </div>
                 </div>
-                <div className="form-group custom-radio">
-                  <label>Select Department</label>
-                  <select
-                    className="form-control"
-                    name="deptId"
-                    onChange={handleChange}
-                    required
-                  >
-                    <option value="" selected disabled>
-                      Select
-                    </option>
-                    {departments?.map((dept, index) => (
-                      <option value={dept.deptId} key={index}>
-                        {dept.deptName}
+                {!(form.category === "Non Employees" || form.category === "Custom Booking") &&
+                  <div className="form-group custom-radio">
+                    <label>Select Department</label>
+                    <select
+                      className="form-control"
+                      name="deptId"
+                      onChange={handleChange}
+                      required
+                      value={form.deptId}
+                    >
+                      <option value="" selected disabled>
+                        Select
                       </option>
-                    ))}
-                  </select>
-                </div>
+                      {departments?.map((dept, index) => (
+                        <option value={dept.deptId} key={index}>
+                          {dept.deptName}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+                }
                 <div className="form-group">
                   <label>Notes</label>
                   <textarea
@@ -312,53 +447,55 @@ const BookingContent = () => {
                     onChange={handleChange}
                   />
                 </div>
-                <div className="form-group">
-                  <label>Select Employees</label>
+                {!(form.category === "Non Employees" || form.category === "Custom Booking") &&
+                  <div className="form-group">
+                    <label>Select Employees</label>
+                    <div className="table-responsive">
+                      <table className="table table-hover responsive nowrap table-bordered">
+                        <thead>
+                          <tr>
+                            <th>
+                              <div className="form-group mb-0">
+                                <label className="custom-checkbox">
+                                  <input
+                                    className="checkbox__input" type="checkbox" />
+                                  <span className="checkbox__checkmark"></span>
+                                </label>
+                              </div>
+                            </th>
+                            <th>Employee ID</th>
+                            <th>Employee Name</th>
+                            <th>Department</th>
+                          </tr>
+                        </thead>
+                        <tbody>
 
-                  <div className="table-responsive">
-                    <table className="table table-hover responsive nowrap table-bordered">
-                      <thead>
-                        <tr>
-                          <th>
-                            <div className="form-group mb-0">
-                              <label className="custom-checkbox">
-                                <input
-                                  className="checkbox__input" type="checkbox"/>
-                                <span className="checkbox__checkmark"></span>
-                              </label>
-                            </div>
-                          </th>
-                          <th>Employee ID</th>
-                          <th>Employee Name</th>
-                          <th>Department</th>
-                        </tr>
-                      </thead>
-                      <tbody>
-                          
                           {users?.map((user, i) => (
                             <tr key={i}>
                               <td>
-                            <div className="form-group mb-0">
-                              <label className="custom-checkbox m-0">
-                                <input className="checkbox__input" name="employees" value={user.userId} 
-                                // checked={form.employees === user.userId}
-                                onChange={handleCheckBoxChange} type="checkbox"
-                                />
-                                <span className="checkbox__checkmark"></span>
-                              </label>
-                            </div>
-                          </td>
+                                <div className="form-group mb-0">
+                                  <label className="custom-checkbox m-0">
+                                    <input className="checkbox__input" name="employees" value={user.userId}
+                                      // checked={form.employees === user.userId}
+                                      onChange={handleCheckBoxChange} type="checkbox"
+                                    />
+                                    <span className="checkbox__checkmark"></span>
+                                  </label>
+                                </div>
+                              </td>
                               <td>{user.userId}</td>
                               <td>{user.firstName + " " + user.lastName}</td>
                               <td>{user.department}</td>
                             </tr>
                           ))}
-                      </tbody>
-                    </table>
+                        </tbody>
+                      </table>
+                    </div>
                   </div>
-                </div>
+                }
                 <div className="modal-footer">
-                  <button type="button" className="btn btn-outline-primary">
+                  <button type="button" className="btn btn-outline-primary"
+                    onClick={resetForm}>
                     Cancel
                   </button>
                   <button type="submit" className="btn btn-primary">

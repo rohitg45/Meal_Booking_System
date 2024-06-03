@@ -6,8 +6,7 @@ import { ApiResponse } from "../utils/ApiResponse.js";
 const verifyJWT = async(req,res, next) => {
     try {
         const token = req.cookies?.accessToken || req.header("Authorization")?.replace("Bearer ", "")
-        
-        // console.log(token);
+
         if (!token) {
             return res.status(401).json(
                 new ApiResponse(401,{}, "Unauthorised user")
@@ -16,10 +15,9 @@ const verifyJWT = async(req,res, next) => {
     
         const decodedToken = jwt.verify(token, process.env.ACCESS_TOKEN_SECRET)
     
-        const user = await User.findById(decodedToken?._id).select("-password -refreshToken")
+        const user = await User.findById(decodedToken?._id);
     
         if (!user) {
-            
             return res.status(404).json(
                 new ApiResponse(404,{}, "User Not found")
             )

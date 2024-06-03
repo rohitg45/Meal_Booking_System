@@ -3748,7 +3748,7 @@ textarea.form-control-lg {
 }
 .nav-link.active {
   font-weight: 600;
-  color: #FFF !important;
+  color: #FFF !important ;
 }
 .nav-link.disabled {
   color: #6c757d;

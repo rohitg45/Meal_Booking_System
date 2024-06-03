@@ -28,7 +28,7 @@ const Userdata = () => {
 
   const getUser = ()=>{
     axios
-      .get(`http://localhost:8000/api/user/getUser`)
+      .get(`http://localhost:8000/api/user/getUser`, { withCredentials: true })
       .then((response) => setUsers(response.data.data))
       .catch((err) => console.log(err));
   }
@@ -54,7 +54,8 @@ const Userdata = () => {
     // Update User
     if(editUserID){
       axios.put(`http://localhost:8000/api/user/updateUser/${editUserID}`, newUser, { 
-        headers: {'Content-Type': 'application/json'} 
+        headers: {'Content-Type': 'application/json'} ,
+        withCredentials: true 
       })
       .then(res=> getUser())
       .catch(err => alert(err))
@@ -80,12 +81,14 @@ const Userdata = () => {
       getUser();
       alert("User created successfully! check your mail!");
     }
+
+    resetForm();
   };
 
   const deleteUser = (userId)=>{
     if(window.confirm("Do you want to delete this User with ID: "+userId)){ 
     axios
-      .delete(`http://localhost:8000/api/user/deleteUser/${userId}`)
+      .delete(`http://localhost:8000/api/user/deleteUser/${userId}`,{ withCredentials: true })
       .then((response) => {
         getUser();
         alert(response.data.message)
@@ -108,7 +111,7 @@ const Userdata = () => {
     }
     setEditUserID(editUserId);
   }
-  const resetForm = (userId)=>{
+  const resetForm = ()=>{
     setFormData({
       firstName: "",
       lastName: "",
@@ -277,7 +280,7 @@ const Userdata = () => {
                 <div className="modal-footer">
                   <button type="reset" className="btn btn-outline-primary" data-dismiss="modal"
                   onClick={resetForm}>
-                    Reset
+                    Cancel
                   </button>
                   <button type="submit" className="btn btn-primary">
                     { editUserID ? "Edit User" : "Add User"}

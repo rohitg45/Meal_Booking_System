@@ -48,7 +48,8 @@ const registerUser = async (req, res) => {
      password: ${user.password}<br/>
     click here to login: <a href="http://localhost:3000">http://localhost:3000</a>`;
 
-    sendMail(registeredUser.email,subject,body)
+    sendMail(registeredUser.email,subject,body);
+
     return res.status(201).json(
         new ApiResponse(201, registeredUser, "User registered Successfully")
     )
@@ -70,8 +71,6 @@ const generateAccessToken = async(userId) =>{
         const accessToken = user.generateAccessToken()
 
         return {accessToken}
-
-
     } catch (error) {
         return res.status(500).json(
             new ApiResponse(500, {}, "Something went wrong while generating referesh and access token")
@@ -87,7 +86,6 @@ const loginUser = async (req, res) => {
             new ApiResponse(400, {}, "Email and password is required")
         )
     }
-
 
     const user = await User.findOne({ email });
 
@@ -105,8 +103,6 @@ const loginUser = async (req, res) => {
 
     const { accessToken } = await generateAccessToken(user._id)
 
-    const loggedInUser = await User.findById(user._id);
-
     const options = {
         domain: "localhost",
         sameSite: "none",
@@ -121,11 +117,34 @@ const loginUser = async (req, res) => {
             new ApiResponse(
                 200,
                 {
-                    user: loggedInUser, accessToken,
+                    user: user, accessToken,
                 },
                 "User logged In Successfully"
             )
         )
+}
+
+const resetPassword = async (req, res) => {
+    const {password, confirmPassword} = req.body;
+
+    if(password !== confirmPassword){
+        return res.status(401).json(
+            new ApiResponse(401, {}, "Password doesn't match")
+        )
+    }
+
+    try {
+        User.updateOne({ userId: req.user.userId }, { password });
+
+        return res.status(200).json(
+            new ApiResponse(200, {}, "Password reset")
+        )
+
+    } catch (error) {
+         return res.status(500).json(
+            new ApiResponse(500, {}, "Error while reset password")
+        )
+    }
 }
 
 const logoutUser = async (req, res) => {
@@ -275,4 +294,4 @@ const getAllUsers = async (req, res) => {
         )
     }
   };
-export { registerUser, loginUser, logoutUser,forgotPassword,getAllUsers, deleteUser, updateUser };
+export { registerUser, loginUser, logoutUser,forgotPassword,resetPassword, getAllUsers, deleteUser, updateUser };

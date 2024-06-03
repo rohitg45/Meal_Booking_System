@@ -9,7 +9,8 @@ const BookingContent = () => {
   const [form, setForm] = useState({
     category: "Employees",
     mealType: "Lunch",
-    date: "",
+    startDate: "",
+    endDate: "",
     deptId: "",
     notes: "",
     bookingCount: 1,
@@ -22,6 +23,7 @@ const BookingContent = () => {
   const [nonEmployeesBookings, setNonEmployeesBookings] = useState([]);
   const [customBookings, setCustomBookings] = useState([]);
 
+  //To set department and get users
   useEffect(() => {
     axios
       .get(`http://localhost:8000/api/department`)
@@ -29,37 +31,49 @@ const BookingContent = () => {
       .catch((err) => console.log(err));
 
     axios
-      .get(`http://localhost:8000/api/user/getUser`)
+      .get(`http://localhost:8000/api/user/getUser`, { withCredentials: true })
       .then((response) => setUsers(response.data.data))
       .catch((err) => console.log(err));
 
     getBookings();
   }, []);
 
+
+  //To show booked list details differently
   const getBookings = async () => {
     try {
-      let response = await axios.get('http://localhost:8000/api/booking/getBookings',{
-        params: { category: "Employees"} 
-      });
+      let response = await axios.get(
+        "http://localhost:8000/api/booking/getBookings",
+        {
+          params: { category: "Employees" },
+          withCredentials: true 
+        }
+      );
       setEmployeesBookings(response.data.data);
 
-      response = await axios.get('http://localhost:8000/api/booking/getBookings?category=Non Employees');
+      response = await axios.get(
+        "http://localhost:8000/api/booking/getBookings?category=Non Employees",
+        { withCredentials: true }
+      );
       setNonEmployeesBookings(response.data.data);
-      
-      response = await axios.get('http://localhost:8000/api/booking/getBookings?category=Custom Booking');
-      setCustomBookings(response.data.data);  
+
+      response = await axios.get(
+        "http://localhost:8000/api/booking/getBookings?category=Custom Booking",
+        { withCredentials: true }
+      );
+      setCustomBookings(response.data.data);
     } catch (error) {
       console.log("Error while getting bookings: ", error);
-    } 
-  }
+    }
+  };
 
+  // It shows checkbox to show employees based on filletered department 
   useEffect(() => {
     axios
-      .get(`http://localhost:8000/api/user/getUser`,
-        {
-          params: { departmentId: +form.deptId },
-        }
-      )
+      .get(`http://localhost:8000/api/user/getUser`, {
+        params: { departmentId: +form.deptId },
+        withCredentials: true 
+      })
       .then((response) => setUsers(response.data.data))
       .catch((err) => console.log(err));
   }, [form]);
@@ -70,24 +84,36 @@ const BookingContent = () => {
     const { name, value } = e.target;
     setForm({ ...form, [name]: value });
 
-    if (name === "category" && (value === "Non Employees" || value === "Custom Booking")) {
+    if (
+      name === "category" &&
+      (value === "Non Employees" || value === "Custom Booking")
+    ) {
       setCategoryType(value);
     }
+
+    // if(form.category=="Employees" && form.employees.length && (name=="startDate" || name=="endDate")){
+    //   setBookingCountForEmployess();
+    // }
   };
 
+  //used for check or unchecked of employees in form
   const handleCheckBoxChange = (e) => {
     const { value, checked } = e.target;
-    if (checked)
+    if (checked) 
       setForm({ ...form, employees: [...form.employees, value] });
     else
-      setForm({ ...form, employees: form.employees.filter(emp => emp !== value) });
+      setForm({
+        ...form,
+        employees: form.employees.filter((emp) => emp !== value),
+      });
+    // setBookingCountForEmployess();
   };
+
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    const { name, value } = e.target;
 
-    if (form.employees.length == 0 && (name === "category" && (value === "Non Employees"))) {
+    if (form.category === "Employees" && form.employees.length == 0) {
       alert("Please select employees");
       return;
     }
@@ -95,13 +121,26 @@ const BookingContent = () => {
     const newBooking = {
       category: form.category,
       mealType: form.mealType,
-      date: form.date,
-      department: +form.deptId,
+      startDate: form.startDate,
+      endDate: form.endDate,
       notes: form.notes,
       bookingCount: +form.bookingCount,
-      selectedEmployees: form.employees,
     };
 
+    //If employee is selected then added two properties in booking employee list and note deleted.
+    if (form.category === "Employees") {
+      newBooking.department = +form.deptId;
+      newBooking.selectedEmployees = form.employees;
+      delete newBooking.notes;
+
+      const date1 = new Date(form.startDate);
+      const date2 = new Date(form.endDate);
+      const diffTime = Math.abs(date2 - date1);
+      const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
+      newBooking.bookingCount = (diffDays+1) * form.employees.length;
+    }
+
+    //To book the meal
     try {
       const res = await axios.post(
         "http://localhost:8000/api/booking/createbooking",
@@ -113,8 +152,6 @@ const BookingContent = () => {
           withCredentials: true,
         }
       );
-
-      console.log(res);
 
       if (!res.data.success) {
         alert(res.data.message);
@@ -131,31 +168,37 @@ const BookingContent = () => {
     }
   };
 
-  const resetForm = (userId) => {
+  // To reset the form
+  const resetForm = () => {
     setForm({
       category: "Employees",
       mealType: "Lunch",
-      date: "",
+      startDate: "",
+      endDate: "",
       deptId: "",
       notes: "",
       bookingCount: 1,
       employees: [],
     });
-  }
+  };
 
   const formatDate = (dateString) => {
     const date = new Date(dateString);
     return date.toLocaleString("en-US", {
-      weekday: "long",
-      year: "numeric",
-      month: "long",
+      // weekday: "long",
       day: "numeric",
-      hour: "numeric",
-      minute: "numeric",
-      second: "numeric",
-      timeZone: "UTC",
+      month: "long",
+      year: "numeric",
+      // hour: "numeric",
+      // minute: "numeric",
+      // second: "numeric",
+      // timeZone: "UTC",
     });
   };
+
+  const cD = new Date();
+  cD.setMonth(cD.getMonth() + 3);
+  const maxDate = cD.toISOString().split("T")[0];
 
   return (
     <div className="container-fluid">
@@ -235,16 +278,24 @@ const BookingContent = () => {
                 <tbody>
                   {employeesBookings?.map((booking, i) => (
                     <tr key={i}>
-                      <td>{
-                        booking.selectedEmployees.map(empId => <div>{empId}</div>)
-                      }</td>
-                      <td>{
-                        booking.users.map(user => <div>{user.firstName + " " + user.lastName}</div>)
-                      }</td>
+                      <td>
+                        {booking.selectedEmployees.map((empId) => (
+                          <div>{empId}</div>
+                        ))}
+                      </td>
+                      <td>
+                        {booking.users.map((user) => (
+                          <div>{user.firstName + " " + user.lastName}</div>
+                        ))}
+                      </td>
                       <td>{booking.department.deptName}</td>
                       <td>{booking.mealType}</td>
                       <td>{booking.bookingCount}</td>
-                      <td>{formatDate(booking.date)}</td>
+                      <td>
+                        {formatDate(booking.startDate) +
+                          " - " +
+                          formatDate(booking.endDate)}
+                      </td>
                     </tr>
                   ))}
                 </tbody>
@@ -267,11 +318,15 @@ const BookingContent = () => {
                   </tr>
                 </thead>
                 <tbody>
-                  {[...nonEmployeesBookings,...customBookings].map((i) => (
+                  {[...nonEmployeesBookings, ...customBookings].map((i) => (
                     <tr key={i._id}>
                       <td>{i.category}</td>
                       <td>{i.mealType}</td>
-                      <td>{formatDate(i.date)}</td>
+                      <td>
+                        {formatDate(i.startDate) +
+                          " - " +
+                          formatDate(i.endDate)}
+                      </td>
                       <td>{i.notes}</td>
                       <td>{i.bookingCount}</td>
                     </tr>
@@ -302,7 +357,9 @@ const BookingContent = () => {
                 data-dismiss="modal"
                 aria-label="Close"
               >
-                <span aria-hidden="true" onClick={resetForm}>×</span>
+                <span aria-hidden="true" onClick={resetForm}>
+                  ×
+                </span>
               </button>
             </div>
             <div className="modal-body">
@@ -387,24 +444,52 @@ const BookingContent = () => {
                     <input className="checkbox__input" type="checkbox" name="isWeekend" checked={form.isWeekend} onChange={handleCheckboxChange} /><span className="checkbox__checkmark"></span>
                   </label>
                 </div> */}
-                <div className="form-group">
-                  <label>Select Date(s)</label>
-                  <div className="input-group date-picker-input">
-                    <input
-                      type="date"
-                      className="form-control border-right-0"
-                      placeholder="Select Date"
-                      name="date"
-                      value={form.date}
-                      onChange={handleChange}
-                      required
-                    />
-                    <div className="input-group-append bg-transparent">
-                      {/* <span className="input-group-text bg-transparent" id="basic-addon2"><i className="icon-calendar"></i></span> */}
+                <div className="row">
+                  <div className="col">
+                    <div className="form-group">
+                      <label>Select Start Date</label>
+                      <div className="input-group date-picker-input">
+                        <input
+                          type="date"
+                          className="form-control border-right-0"
+                          placeholder="Select Date"
+                          name="startDate"
+                          min={new Date().toISOString().split('T')[0]}
+                          value={form.startDate}
+                          onChange={handleChange}
+                          required
+                        />
+                        <div className="input-group-append bg-transparent">
+                          {/* <span className="input-group-text bg-transparent" id="basic-addon2"><i className="icon-calendar"></i></span> */}
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  <div className="col">
+                    <div className="form-group">
+                      <label>Select End Date</label>
+                      <div className="input-group date-picker-input">
+                        <input
+                          type="date"
+                          className="form-control border-right-0"
+                          placeholder="Select Date"
+                          name="endDate"
+                          max={ maxDate}
+                          value={form.endDate}
+                          onChange={handleChange}
+                          required
+                        />
+                        <div className="input-group-append bg-transparent">
+                          {/* <span className="input-group-text bg-transparent" id="basic-addon2"><i className="icon-calendar"></i></span> */}
+                        </div>
+                      </div>
                     </div>
                   </div>
                 </div>
-                {!(form.category === "Non Employees" || form.category === "Custom Booking") &&
+                {!(
+                  form.category === "Non Employees" ||
+                  form.category === "Custom Booking"
+                ) && (
                   <div className="form-group custom-radio">
                     <label>Select Department</label>
                     <select
@@ -424,7 +509,7 @@ const BookingContent = () => {
                       ))}
                     </select>
                   </div>
-                }
+                )}
                 <div className="form-group">
                   <label>Notes</label>
                   <textarea
@@ -436,6 +521,7 @@ const BookingContent = () => {
                     onChange={handleChange}
                   ></textarea>
                 </div>
+
                 <div className="form-group">
                   <label>Booking Count</label>
                   <input
@@ -445,9 +531,14 @@ const BookingContent = () => {
                     name="bookingCount"
                     value={form.bookingCount}
                     onChange={handleChange}
+                    disabled={form.category == "Employees" ? true : false}
                   />
                 </div>
-                {!(form.category === "Non Employees" || form.category === "Custom Booking") &&
+
+                {!(
+                  form.category === "Non Employees" ||
+                  form.category === "Custom Booking"
+                ) && (
                   <div className="form-group">
                     <label>Select Employees</label>
                     <div className="table-responsive">
@@ -458,7 +549,9 @@ const BookingContent = () => {
                               <div className="form-group mb-0">
                                 <label className="custom-checkbox">
                                   <input
-                                    className="checkbox__input" type="checkbox" />
+                                    className="checkbox__input"
+                                    type="checkbox"
+                                  />
                                   <span className="checkbox__checkmark"></span>
                                 </label>
                               </div>
@@ -469,15 +562,18 @@ const BookingContent = () => {
                           </tr>
                         </thead>
                         <tbody>
-
                           {users?.map((user, i) => (
                             <tr key={i}>
                               <td>
                                 <div className="form-group mb-0">
                                   <label className="custom-checkbox m-0">
-                                    <input className="checkbox__input" name="employees" value={user.userId}
+                                    <input
+                                      className="checkbox__input"
+                                      name="employees"
+                                      value={user.userId}
                                       // checked={form.employees === user.userId}
-                                      onChange={handleCheckBoxChange} type="checkbox"
+                                      onChange={handleCheckBoxChange}
+                                      type="checkbox"
                                     />
                                     <span className="checkbox__checkmark"></span>
                                   </label>
@@ -492,11 +588,14 @@ const BookingContent = () => {
                       </table>
                     </div>
                   </div>
-                }
+                )}
                 <div className="modal-footer">
-                  <button type="button" className="btn btn-outline-primary"
-                    onClick={resetForm}>
-                    Cancel
+                  <button
+                    type="button"
+                    className="btn btn-outline-primary"
+                    onClick={resetForm}
+                  >
+                    Reset
                   </button>
                   <button type="submit" className="btn btn-primary">
                     Book

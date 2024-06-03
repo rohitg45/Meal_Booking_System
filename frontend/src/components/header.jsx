@@ -52,7 +52,7 @@ const Header = () => {
             <ul className="navbar-nav me-auto mb-2 mb-lg-0">
               <li className="nav-item">
                 <Link
-                  className="nav-link active"
+                  className="nav-link"
                   aria-current="page"
                   to="/calendar"
                 >
@@ -175,8 +175,8 @@ const Header = () => {
                           </div>
                         </div>
                       </div>
-                    </div></li> */}
-                    {/* <li><Link className="dropdown-item" onClick={logOut}>Logout</Link></li> */}
+                    </div></li>
+                     <li><Link className="dropdown-item" onClick={logOut}>Logout</Link></li> */}
                   </ul>
                 </li>
               </ul>

@@ -75,7 +75,7 @@ const Login = () => {
             <h3 className="login-head">Sign in to your account</h3>
             <p className="login-text">Enter your credentials to access your account.</p>
             <div className="form-group">
-              <label className="control-label">User Name</label>
+              <label className="control-label">Email</label>
               <div className="input-addon">
                 <input
                   className="form-control"

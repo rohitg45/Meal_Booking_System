@@ -1,5 +1,4 @@
 import { Counter } from "../models/counter.model.js";
-import { ApiResponse } from "../utils/ApiResponse.js";
 
 const getNextSequenceValue = async (sequenceName) => {
     const sequenceDocument = await Counter.findOneAndUpdate(

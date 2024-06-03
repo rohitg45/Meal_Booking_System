@@ -20,11 +20,8 @@ app.use(express.json({limit: "16kb"}))
 app.use(express.urlencoded({extended: true, limit: "16kb"}))
 app.use(cookieParser())
 
-
 const PORT = process.env.PORT || 5000;
 connectDB();
-
-app.use(express.json());
 
 /** routes */
 // app.use('/api', appRoute);

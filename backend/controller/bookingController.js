@@ -2,12 +2,13 @@ import { Booking } from "../models/booking.model.js";
 import { ApiResponse } from "../utils/ApiResponse.js";
 
 const createBooking = async (req, res) => {
-  const { category, mealType, date, department, notes, bookingCount, selectedEmployees } = req.body;
+  const { category, mealType, startDate, endDate , department, notes, bookingCount, selectedEmployees } = req.body;
 
   const booking = new Booking({
     category,
     mealType,
-    date,
+    startDate,
+    endDate,
     department,
     notes,
     bookingCount,

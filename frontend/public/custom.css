@@ -35,3 +35,8 @@
 .circle.cb{
     background-color: #6FCB1F !important;
 }
+
+#myTab .nav-link,
+#myTab .nav-link.active{
+    color: #333 !important;
+}

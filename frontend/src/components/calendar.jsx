@@ -1,5 +1,6 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link } from "react-router-dom";
+import axios from "axios";
 import Header from './header';
 import Footer from './footer';
 import { Calendar as BigCalendar, momentLocalizer } from 'react-big-calendar';
@@ -8,30 +9,76 @@ import 'react-big-calendar/lib/css/react-big-calendar.css';
 
 const localizer = momentLocalizer(moment);
 
-const getCircles = (employees, nonEmployees, customBooking )=>{
-return <>
-<span className='circle emp'>{employees}</span>
-<span className='circle nemp'>{nonEmployees}</span>
-<span className='circle cb'>{customBooking}</span>
-</>
+const getCircles = (employees, nonEmployees, customBooking) => {
+  return <>
+    <span className='circle emp'>{employees}</span>
+    <span className='circle nemp'>{nonEmployees}</span>
+    <span className='circle cb'>{customBooking}</span>
+  </>
 }
+
+
+
 const Calendar = () => {
   // Sample events for the calendar
   const [events, setEvents] = useState([
     {
       id: 0,
-      title: getCircles(100,130, 50),
-      start: new Date(2024, 4, 29, 10, 0), // June 29, 2023, 10:00 AM
-      end: new Date(2024, 4, 29, 12, 0),   // June 29, 2023, 12:00 PM
+      title: getCircles(100, 130, 50),
+      start: new Date(2024, 4, 29), // June 29, 2023, 10:00 AM
+      end: new Date(2024, 4, 29),   // June 29, 2023, 12:00 PM
     },
     {
       id: 1,
       title: getCircles(111, 453, 33),
-      start: new Date(2024, 4, 31, 19, 0), // June 30, 2023, 7:00 PM
-      end: new Date(2024, 4, 31, 21, 0),   // June 30, 2023, 9:00 PM
+      start: new Date(2024, 4, 31), // June 30, 2023, 7:00 PM
+      end: new Date(2024, 4, 31,),   // June 30, 2023, 9:00 PM
     },
     // Add more events here
   ]);
+
+  const [employeesBookings, setEmployeesBookings] = useState([]);
+  const [nonEmployeesBookings, setNonEmployeesBookings] = useState([]);
+  const [customBookings, setCustomBookings] = useState([]);
+
+  useEffect(() => {
+    getBookings();
+  }, []);
+
+  const getBookings = async () => {
+    try {
+      let response = await axios.get(
+        "http://localhost:8000/api/booking/getBookings",
+        {
+          params: { category: "Employees" },
+        }
+      );
+      setEmployeesBookings(response.data.data);
+
+      response = await axios.get(
+        "http://localhost:8000/api/booking/getBookings?category=Non Employees"
+      );
+      setNonEmployeesBookings(response.data.data);
+
+      response = await axios.get(
+        "http://localhost:8000/api/booking/getBookings?category=Custom Booking"
+      );
+      setCustomBookings(response.data.data);
+
+      calculate();
+    } catch (error) {
+      console.log("Error while getting bookings: ", error);
+    }
+  };
+
+  const calculate = () =>{
+    console.log(employeesBookings, nonEmployeesBookings, customBookings);
+  }
+
+  const handleSelectSlot = ({ start }) => {
+    const date = moment(start).format('YYYY-MM-DD');
+    console.log("ss ",start);
+  };
 
   return (
     <>
@@ -53,6 +100,9 @@ const Calendar = () => {
                     startAccessor="start"
                     endAccessor="end"
                     style={{ height: 500 }}
+                    selectable={true}
+                    onSelectSlot={handleSelectSlot}
+                    onSelectEvent={handleSelectSlot}
                   />
                 </div>
               </div>
